@@ -1,0 +1,22 @@
+access connector id
+/subscriptions/7fe05a72-32fd-445d-a192-ef582b97af20/resourceGroups/rg-databricks-metastore/providers/Microsoft.Databricks/accessConnectors/databricks-access-connector-southcentralus
+
+metastore
+abfss://metastore@hudsonjwhdbricksmetastor.dfs.core.windows.net/metastorepath
+
+
+volume_citibike_dev_location
+abfss://volume-citibikes-dev@hudsonjwhdbricksvolumes.dfs.core.windows.net/volumes
+
+volume_citibike_test_location
+abfss://volume-citibikes-test@hudsonjwhdbricksvolumes.dfs.core.windows.net/volumes
+
+volume_citibike_prod_location
+abfss://volume-citibikes-prod@hudsonjwhdbricksvolumes.dfs.core.windows.net/volumes
+
+databricks-app-registration
+application_client_id: 7585b58d-74db-47a0-b44c-003f4866bdbf
+object_id: 4f4496b7-aa95-4e59-b110-e2fd996a2879
+tenant_id:cb374559-0d74-4891-bc34-2df770e00396
+secretid: ef2ba09a-f97e-4ff7-b1b1-cd294446cc71
+secret: MPN8Q~OPT~mafHDLHnsMbtM7wvvfosRryCKzkdz7

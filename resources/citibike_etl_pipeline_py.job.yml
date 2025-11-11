@@ -1,0 +1,61 @@
+resources:
+  jobs:
+    citibike_etl_pipeline_py:
+      name: citibike_etl_pipeline_py
+      tasks:
+        # - task_key: 00_whl_upload
+        #     python_wheel_task:
+        #       package_name: dab_project
+        #       entry_point: main
+        #     existing_cluster_id: "${var.all_purpose_cluster_id}" 
+        #     libraries:
+        #       - whl: ../dist/*.whl
+        - task_key: 01_bronze_citibike
+          spark_python_task:
+            python_file: ../citibike_etl/scripts/01_bronze/01_bronze_citibike.py
+            parameters:
+              - "{{job.id}}" # sys.argv[1] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{job.run_id}}" # sys.argv[2] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{task.run_id}}" # sys.argv[3] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{job.start_time.iso_datetime}}" # sys.argv[4] -- (sys.argv[0] gives the path and you do not override that one)
+              - "${var.catalog}" # sys.argv[5] -- (sys.argv[0] gives the path and you do not override that one)
+          # job_cluster_key: ds4_v3_sn
+          existing_cluster_id: "${var.all_purpose_cluster_id}"
+        - task_key: 02_silver_citibike
+          depends_on:
+            - task_key: 01_bronze_citibike
+          spark_python_task:
+            python_file: ../citibike_etl/scripts/02_silver/02_silver_citibike.py
+            parameters:
+              - "{{job.id}}" # sys.argv[1] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{job.run_id}}" # sys.argv[2] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{task.run_id}}" # sys.argv[3] -- (sys.argv[0] gives the path and you do not override that one)
+              - "{{job.start_time.iso_datetime}}" # sys.argv[4] -- (sys.argv[0] gives the path and you do not override that one)
+              - "${var.catalog}" # sys.argv[5] -- (sys.argv[0] gives the path and you do not override that one)
+          # job_cluster_key: ds4_v3_sn
+          existing_cluster_id: "${var.all_purpose_cluster_id}"
+          libraries:
+            - whl: ../dist/*.whl
+        - task_key: 03_gold_citibike_daily_ride_summary
+          depends_on:
+            - task_key: 02_silver_citibike
+          spark_python_task:
+            python_file: ../citibike_etl/scripts/03_gold/03_gold_citibike_daily_ride_summary.py
+            parameters:
+              - "${var.catalog}"
+          # job_cluster_key: ds4_v3_sn    
+          existing_cluster_id: "${var.all_purpose_cluster_id}"
+        - task_key: 03_gold_citibike_daily_station_performance
+          depends_on:
+            - task_key: 02_silver_citibike
+          spark_python_task:
+            python_file: ../citibike_etl/scripts/03_gold/03_gold_citibike_daily_station_performance.py
+            parameters:
+              - "${var.catalog}"
+          # job_cluster_key: ds4_v3_sn
+          existing_cluster_id: "${var.all_purpose_cluster_id}"
+      job_clusters:
+        - job_cluster_key: ds4_v3_sn
+          new_cluster: "${var.ds4_v3_sn}"
+      queue:
+        enabled: true

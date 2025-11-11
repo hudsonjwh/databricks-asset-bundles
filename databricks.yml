@@ -1,0 +1,48 @@
+# This is a Databricks asset bundle definition for dab_project.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: dab_project
+  uuid: 08c47807-412a-4a09-9d36-1e94be3470c9
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+variables:
+  catalog:
+    default: "citibikes_dev"
+  dev_flag:
+    default: true
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'portal.azure.com
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-111812186350748.8.azuredatabricks.net/
+
+    presets:
+      # Set dynamic_version: true on all artifacts of type "whl".
+      # This makes "bundle deploy" add a timestamp to wheel's version before uploading,
+      # new wheel takes over the previous installation even if actual wheel version is unchanged.
+      # See https://docs.databricks.com/aws/en/dev-tools/bundles/settings
+      artifacts_dynamic_version: true
+
+  # prod:
+  #   mode: production
+  #   variables:
+  #     catalog:
+  #       default: "citibike_prod"
+  #     dev_flag:
+  #       default: false
+  #   workspace:
+  #     host: https://adb-2197788316888093.13.azuredatabricks.net
+  #     # We explicitly deploy to /Workspace/Users/hudsonjwh@hudsonjwh.onmicrosoft.com to make sure we only have a single copy.
+  #     root_path: /Workspace/Users/hudsonjwh@hudsonjwh.onmicrosoft.com/.bundle/${bundle.name}/${bundle.target}
+  #   permissions:
+  #     - user_name: hudsonjwh@hudsonjwh.onmicrosoft.com
+  #       level: CAN_MANAGE
